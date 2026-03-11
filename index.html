@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Happy Birthday 🎉</title>
+<style>
+  :root{
+    --bg1:#0f1020;
+    --bg2:#1a1740;
+    --accent:#ff6ec7;  /* pink */
+    --accent2:#7ee8fa; /* aqua */
+    --gold:#ffd166;
+    --white:#ffffff;
+    --balloon1:#ff6b6b;
+    --balloon2:#4ecdc4;
+    --balloon3:#ffd166;
+    --balloon4:#c77dff;
+  }
+
+  /* Reset + layout */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji", "Segoe UI Symbol";
+    color:var(--white);
+    background: radial-gradient(1200px 800px at 50% 60%, #2a285a 0%, var(--bg2) 50%, var(--bg1) 100%);
+    overflow:hidden;
+  }
+  .wrap{
+    position:relative;
+    height:100%;
+    width:100%;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding: clamp(16px, 3vw, 48px);
+  }
+
+  /* Soft vignette edges */
+  .vignette{
+    position:fixed; inset:0; pointer-events:none;
+    background: radial-gradient(65% 55% at 50% 50%, transparent 60%, rgba(0,0,0,.25) 100%);
+    z-index: 1;
+  }
+
+  /* Hero title with glow + gradient text */
+  .title{
+    position:relative;
+    z-index:2;
+    line-height:1.1;
+    letter-spacing: 0.5px;
+    text-shadow:
+      0 0 12px rgba(255,255,255,.35),
+      0 0 30px rgba(126,232,250,.25),
+      0 0 60px rgba(255,110,199,.18);
+  }
+  .title h1{
+    margin:0 0 .3rem;
+    font-weight:900;
+    font-size: clamp(36px, 7.5vw, 84px);
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip:text;
+    color: transparent;
+    filter: drop-shadow(0 6px 12px rgba(126,232,250,.2));
+  }
+  .subtitle{
+    font-size: clamp(16px, 2.5vw, 24px);
+    opacity:.9;
+  }
+
+  /* Typewriter wish */
+  .typewriter{
+    margin-top: 1.2rem;
+    font-size: clamp(18px, 2.6vw, 28px);
+    font-weight:600;
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(255,209,102,.45);
+    min-height: 2.5em;
+    display:inline-block;
+    border-right: 2px solid var(--gold);
+    white-space: nowrap;
+    overflow: hidden;
+    animation: caret 700ms steps(1) infinite;
+  }
+  @keyframes caret{50%{border-color: transparent}}
+
+  /* CTA button */
+  .btn{
+    margin-top: 1.6rem;
+    display:inline-flex; align-items:center; gap:.6rem;
+    background: linear-gradient(135deg, #ff8bdc, #7ee8fa);
+    color:#1a1230;
+    border:none; border-radius: 999px;
+    padding: .9rem 1.2rem;
+    font-weight: 800;
+    box-shadow:
+      0 10px 25px rgba(126,232,250,.2),
+      0 6px 14px rgba(255,110,199,.22);
+    cursor:pointer;
+    transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); filter: brightness(1.05) }
+  .btn:active{ transform: translateY(0) scale(.98) }
+
+  /* Floating balloons */
+  .balloons{ position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0 }
+  .balloon{
+    position:absolute;
+    width: clamp(36px, 5vw, 60px);
+    height: calc(clamp(36px, 5vw, 60px) * 1.25);
+    border-radius: 50% 50% 45% 55%/55% 55% 45% 45%;
+    box-shadow: inset -6px -10px 16px rgba(0,0,0,.18),
+                0 16px 30px rgba(0,0,0,.25);
+    animation: floatUp linear infinite;
+  }
+  .balloon:after{
+    content:"";
+    position:absolute; left:50%; top:98%;
+    width:2px; height: 50px;
+    background: rgba(255,255,255,.3);
+    transform: translateX(-50%);
+  }
+  @keyframes floatUp{
+    from{ transform: translateY(110vh) translateX(var(--x)) rotate(var(--r)); opacity: 0 }
+    10%{ opacity: 1 }
+    to{ transform: translateY(-20vh) translateX(calc(var(--x) + 10px)) rotate(calc(var(--r) + 20deg)); opacity: .95 }
+  }
+
+  /* Sparkles layer */
+  .sparkles{
+    position:fixed; inset:0; pointer-events:none; z-index: 1;
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,.25), transparent 60%),
+      radial-gradient(1.5px 1.5px at 40% 80%, rgba(126,232,250,.35), transparent 60%),
+      radial-gradient(1.5px 1.5px at 85% 20%, rgba(255,110,199,.35), transparent 60%);
+    animation: twinkle 6s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,.25));
+  }
+  @keyframes twinkle{
+    from{ opacity:.45; transform: scale(1) }
+    to{ opacity:.9; transform: scale(1.03) }
+  }
+
+  /* Canvas for confetti/fireworks */
+  canvas#fx{
+    position:fixed; inset:0; z-index: 2; pointer-events:none;
+  }
+
+  /* Footer note */
+  .note{
+    position: fixed; bottom: 10px; width:100%; text-align:center; z-index:2;
+    font-size: 12px; opacity:.6;
+  }
+
+  /* Responsive safety */
+  @media (max-width: 420px){
+    .btn{ padding:.75rem 1rem; font-size: 14px }
+  }
+</style>
+</head>
+<body>
+  <!-- Background layers -->
+  <div class="balloons" id="balloons"></div>
+  <div class="sparkles"></div>
+  <canvas id="fx"></canvas>
+  <div class="vignette"></div>
+
+  <!-- Content -->
+  <main class="wrap">
+    <section class="title">
+      <!-- ✨ Change the name below -->
+      <h1>Happy Birthday, <span id="name">My Dear Komal</span>! 🎂</h1>
+      <div class="subtitle">Wishing you joy, laughter, and magical moments today & always.</div>
+      <!-- ✨ Your wish will type here -->
+      <div class="typewriter" id="typewriter"></div>
+      <br />
+      <button class="btn" id="celebrateBtn" aria-label="Start celebration">
+        <span>🎉 Celebrate</span>
+      </button>
+    </section>
+  </main>
+
+  <div class="note">Tip: Click “Celebrate” (or anywhere) for more confetti & fireworks.</div>
+
+<script>
+/* ---------------------------
+   QUICK CUSTOMIZATION
+   ---------------------------
+   - Change the displayed name:
+       document.getElementById('name').textContent = "Harendra";
+   - Update the message to type:
+       const message = "Have a fantastic year ahead ✨";
+   - Adjust balloon count & colors below.
+*/
+
+(function(){
+  // Personalized text
+  const nameEl = document.getElementById('name');
+  // Example: nameEl.textContent = "Harendra";
+
+  const message = "May your day sparkle with happiness, surprises, and sweet memories!";
+
+  // Typewriter effect
+  const typeEl = document.getElementById('typewriter');
+  async function typeText(text, speed = 40){
+    typeEl.textContent = "";
+    for(let i=0;i<text.length;i++){
+      typeEl.textContent += text[i];
+      await new Promise(r=>setTimeout(r, text[i] === " " ? speed : speed));
+    }
+  }
+
+  // Balloons
+  const balloonsWrap = document.getElementById('balloons');
+  const balloonColors = ['var(--balloon1)','var(--balloon2)','var(--balloon3)','var(--balloon4)'];
+  const BALLOON_COUNT = Math.min(26, Math.max(14, Math.floor(window.innerWidth/40)));
+
+  function spawnBalloons(){
+    for(let i=0;i<BALLOON_COUNT;i++){
+      const b = document.createElement('div');
+      b.className = 'balloon';
+      const clr = balloonColors[i % balloonColors.length];
+      b.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,.6), ${clr} 38%, ${clr} 70%)`;
+      b.style.left = `${Math.random()*100}%`;
+      b.style.setProperty('--x', `${(Math.random()*80 - 40)}px`);
+      b.style.setProperty('--r', `${(Math.random()*40 - 20)}deg`);
+      const d = 14 + Math.random()*10;
+      b.style.animationDuration = `${d}s`;
+      b.style.animationDelay = `${-Math.random()*d}s`;
+      balloonsWrap.appendChild(b);
+    }
+  }
+
+  // Confetti / Fireworks on Canvas (no libs)
+  const canvas = document.getElementById('fx');
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr;
+  const confetti = [];
+  const fireworks = [];
+
+  function resize(){
+    dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    W = canvas.width = Math.floor(innerWidth * dpr);
+    H = canvas.height = Math.floor(innerHeight * dpr);
+    canvas.style.width = innerWidth + 'px';
+    canvas.style.height = innerHeight + 'px';
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function rand(min,max){ return Math.random()*(max-min)+min }
+  function pick(arr){ return arr[(Math.random()*arr.length)|0] }
+
+  const CONFETTI_COLORS = ['#ff6ec7','#7ee8fa','#ffd166','#4ecdc4','#c77dff','#ffffff'];
+
+  function burstConfetti(x, y, amount = 140){
+    for(let i=0;i<amount;i++){
+      const angle = rand(0, Math.PI*2);
+      const speed = rand(2, 8);
+      confetti.push({
+        x, y, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed - rand(3,8),
+        g: rand(0.08, 0.22),
+        s: rand(2, 4)*dpr,
+        rot: rand(0, Math.PI*2),
+        vr: rand(-0.2, 0.2),
+        life: rand(1.2, 2.2),
+        color: pick(CONFETTI_COLORS),
+        shape: Math.random() < 0.65 ? 'rect' : 'circle'
+      });
+    }
+  }
+
+  function launchFirework(){
+    const x = rand(W*0.15, W*0.85);
+    const y = rand(H*0.2, H*0.5);
+    fireworks.push({
+      x, y, r: 2, vr: rand(1.1, 2.1)*dpr, alpha: 1, hue: rand(0,360)
+    });
+    // Also confetti at that spot
+    burstConfetti(x, y, 110);
+  }
+
+  let lastTime = performance.now();
+  function tick(t){
+    const dt = Math.min(0.045, (t - lastTime)/1000); // seconds
+    lastTime = t;
+
+    ctx.clearRect(0,0,W,H);
+
+    // Confetti physics
+    for(let i=confetti.length-1; i>=0; i--){
+      const p = confetti[i];
+      p.vy += p.g;
+      p.x += p.vx * dpr;
+      p.y += p.vy * dpr;
+      p.rot += p.vr;
+      p.life -= dt * 0.6;
+      if(p.y > H + 40*dpr || p.life <= 0){ confetti.splice(i,1); continue }
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, Math.min(1, p.life));
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      if(p.shape === 'rect'){
+        ctx.fillRect(-p.s, -p.s/2, p.s*2, p.s);
+      }else{
+        ctx.beginPath();
+        ctx.arc(0,0,p.s,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    // Fireworks glow
+    for(let i=fireworks.length-1; i>=0; i--){
+      const fw = fireworks[i];
+      fw.r += fw.vr;
+      fw.alpha -= dt * 0.45;
+      if(fw.alpha <= 0){ fireworks.splice(i,1); continue }
+      const grad = ctx.createRadialGradient(fw.x, fw.y, 0, fw.x, fw.y, fw.r*10);
+      grad.addColorStop(0, `hsla(${fw.hue}, 100%, 70%, ${fw.alpha})`);
+      grad.addColorStop(1, `hsla(${fw.hue}, 100%, 50%, 0)`);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(fw.x, fw.y, fw.r*10, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // First render
+  spawnBalloons();
+  typeText(message);
+
+  // Celebrate triggers
+  const btn = document.getElementById('celebrateBtn');
+  function celebrateAt(x, y){
+    burstConfetti(x*dpr, y*dpr, 160);
+    setTimeout(launchFirework, 100);
+    setTimeout(launchFirework, 350);
+  }
+  btn.addEventListener('click', (e)=>{
+    const rect = btn.getBoundingClientRect();
+    celebrateAt(rect.left + rect.width/2, rect.top + rect.height/2);
+  });
+  window.addEventListener('click', (e)=>{
+    if(e.target === btn) return;
+    celebrateAt(e.clientX, e.clientY);
+  });
+
+  // Auto sparkle celebration a few times
+  setTimeout(()=>launchFirework(), 1200);
+  setTimeout(()=>launchFirework(), 2000);
+  setInterval(()=>{ if(Math.random()<0.25) launchFirework() }, 2500);
+
+})();
+</script>
+</body>
+</html>
